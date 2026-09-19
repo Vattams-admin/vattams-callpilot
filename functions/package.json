@@ -1,0 +1,20 @@
+{
+  "name": "callpilot-functions",
+  "private": true,
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "lint": "echo 'functions lint handled by project tooling'"
+  },
+  "dependencies": {
+    "firebase-functions": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "@types/node": "^24.13.3"
+  }
+}
