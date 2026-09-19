@@ -76,6 +76,13 @@ async function mapplsGet(url, origin) {
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
+    const requestUrl = new URL(request.url);
+
+    // TEMPORARY DIAGNOSTIC - remove once MAPPLS_STATIC_KEY binding is confirmed.
+    // Reveals only the NAMES of bound env vars, never any value.
+    if (requestUrl.searchParams.get("debug") === "env") {
+      return json({ envKeys: Object.keys(env) }, 200, origin);
+    }
 
     if (request.method === "OPTIONS") {
       return new Response(null, {
