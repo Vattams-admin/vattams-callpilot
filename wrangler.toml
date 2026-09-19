@@ -2,3 +2,6 @@ name = "vattams-callpilot-mappls-proxy"
 main = "worker/index.js"
 compatibility_date = "2026-09-19"
 workers_dev = true
+
+[secrets]
+required = ["MAPPLS_API_KEY"]
