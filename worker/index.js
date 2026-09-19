@@ -78,7 +78,7 @@ export default {
     const origin = request.headers.get("Origin") || "";
     const requestUrl = new URL(request.url);
 
-    // TEMPORARY DIAGNOSTIC - remove once MAPPLS_STATIC_KEY binding is confirmed.
+    // TEMPORARY DIAGNOSTIC - remove once MAPPLS_API_KEY binding is confirmed.
     // Reveals only the NAMES of bound env vars, never any value.
     if (requestUrl.searchParams.get("debug") === "env") {
       return json({ envKeys: Object.keys(env) }, 200, origin);
@@ -95,7 +95,7 @@ export default {
       return json({ error: "POST required." }, 405, origin);
     }
 
-    const staticKey = env.MAPPLS_STATIC_KEY;
+    const staticKey = env.MAPPLS_API_KEY;
 
     if (!staticKey) {
       return json(
