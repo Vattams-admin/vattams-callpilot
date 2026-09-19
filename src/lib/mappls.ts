@@ -3,8 +3,6 @@
 // credentials never reach the browser and legacy Mappls CORS/auth constraints
 // do not block the CallPilot web client.
 
-import { httpsCallable } from 'firebase/functions'
-import { functions } from '../firebase'
 
 export type BusinessPlace = {
   name: string
@@ -76,34 +74,33 @@ async function mapplsCall<T>(
   action: MapplsAction,
   payload: { query?: string; eLoc?: string } = {},
 ): Promise<T | null> {
-  const callable = httpsCallable<{ action: MapplsAction; query?: string; eLoc?: string }, T>(
-    functions,
-    'mapplsProxy',
-  )
+  const proxyUrl = import.meta.env.VITE_MAPPLS_PROXY_URL as string | undefined
+
+  if (!proxyUrl) {
+    throw new MapplsApiError('unavailable')
+  }
 
   try {
-    const result = await callable({ action, ...payload })
-    return result.data ?? null
-  } catch (error) {
-    const code = error instanceof Error ? error.message : ''
+    const response = await fetch(proxyUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action, ...payload }),
+    })
 
-    if (code.includes('unauthenticated') || code.includes('permission-denied')) {
-      throw new MapplsApiError('unauthorized')
-    }
-    if (code.includes('resource-exhausted')) {
-      throw new MapplsApiError('rate_limited')
-    }
-    if (code.includes('unavailable')) {
-      throw new MapplsApiError('network')
-    }
-    if (code.includes('invalid-argument')) {
+    if (!response.ok) {
+      if (response.status === 401) throw new MapplsApiError('unauthorized')
+      if (response.status === 403) throw new MapplsApiError('forbidden')
+      if (response.status === 429) throw new MapplsApiError('rate_limited')
+      if (response.status >= 500) throw new MapplsApiError('network')
       throw new MapplsApiError('malformed')
     }
-    if (code.includes('failed-precondition')) {
-      throw new MapplsApiError('unavailable')
-    }
 
-    throw new MapplsApiError('unavailable')
+    return (await response.json()) as T
+  } catch (error) {
+    if (error instanceof MapplsApiError) throw error
+    throw new MapplsApiError('network')
   }
 }
 
