@@ -841,7 +841,13 @@ function App() {
           <div className="plan-modal" onClick={(e) => e.stopPropagation()}>
             <div className="plan-head">
               <span>CALL PLAN</span>
-              <button onClick={() => setShowPlan(false)} type="button">×</button>
+              <button
+                aria-label="Close call plan"
+                onClick={() => setShowPlan(false)}
+                type="button"
+              >
+                ×
+              </button>
             </div>
 
             <div className="approval-status">AWAITING YOUR APPROVAL</div>
