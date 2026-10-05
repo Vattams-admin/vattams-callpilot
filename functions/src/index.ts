@@ -150,12 +150,13 @@ export const mapplsProxy = onCall(
       throw new HttpsError('unauthenticated', 'Sign in is required for business discovery.')
     }
 
-    const data = request.data
+    const rawData = request.data
 
-    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    if (!rawData || typeof rawData !== 'object' || Array.isArray(rawData)) {
       throw new HttpsError('invalid-argument', 'Request payload must be an object.')
     }
 
+    const data = rawData as Record<string, unknown>
     const action = typeof data.action === 'string' ? data.action : ''
     const query = typeof data.query === 'string' ? data.query.trim() : ''
     const eLoc = typeof data.eLoc === 'string' ? data.eLoc.trim() : ''
