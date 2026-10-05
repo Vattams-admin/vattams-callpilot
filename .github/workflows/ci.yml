@@ -5,13 +5,14 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   web:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +25,14 @@ jobs:
       - run: npm run build
 
   functions:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
       run:
         working-directory: functions
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
