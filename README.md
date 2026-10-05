@@ -33,7 +33,7 @@ See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rule
 
 ## Mappls server-side setup
 
-Business discovery now runs through the `mapplsProxy` Firebase Cloud Function. The browser does not call Mappls directly and does not contain Mappls credentials.
+Business discovery runs through the `mapplsProxy` Firebase callable function. The browser uses Firebase's authenticated callable protocol and never receives Mappls credentials.
 
 Mappls Text Search and Nearby APIs use OAuth2. The function obtains an access token with Mappls `client_id` + `client_secret`, then calls the Mappls REST APIs server-side. Configure the production credentials with Firebase Secret Manager (never put them in `VITE_` variables):
 
@@ -47,5 +47,7 @@ Then deploy the function:
 ```bash
 firebase deploy --only functions:mapplsProxy
 ```
+
+No `VITE_MAPPLS_PROXY_URL` is required. The frontend calls the Firebase callable function directly.
 
 The function is deployed to `asia-south1`, matching the project's Firestore region.
