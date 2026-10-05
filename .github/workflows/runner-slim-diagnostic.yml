@@ -1,0 +1,19 @@
+name: CallPilot Slim Runner Diagnostic
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  runner:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    steps:
+      - name: Runner provision test
+        run: |
+          echo "CALLPILOT_SLIM_RUNNER_OK"
+          uname -a
+          node --version || true
