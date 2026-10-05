@@ -1,53 +1,69 @@
-# React + TypeScript + Vite
+# VATTAMS CallPilot
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+VATTAMS CallPilot is a React + TypeScript web application for preparing approved business-call requests and presenting a simulated call lifecycle. It is currently a demo product: it does **not** place real phone calls.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19 + TypeScript + Vite
+- Firebase Authentication
+- Firebase callable Cloud Functions
+- Firebase Secret Manager
+- Mappls business discovery
+- Oxlint + TypeScript production builds
+- GitHub Actions CI
 
-## React Compiler
+## Security model
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Firebase Authentication is required for business discovery.
+- Firestore client access is intentionally denied; server-side callable functions are the trusted application boundary.
+- Mappls OAuth credentials stay server-side in Firebase Secret Manager.
+- No Mappls credentials are exposed through VITE_ frontend variables.
+- The frontend calls mapplsProxy through Firebase's authenticated callable protocol.
 
-## Expanding the Oxlint configuration
+## Mappls configuration
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
-
-## Mappls server-side setup
-
-Business discovery runs through the `mapplsProxy` Firebase callable function. The browser uses Firebase's authenticated callable protocol and never receives Mappls credentials.
-
-Mappls Text Search and Nearby APIs use OAuth2. The function obtains an access token with Mappls `client_id` + `client_secret`, then calls the Mappls REST APIs server-side. Configure the production credentials with Firebase Secret Manager (never put them in `VITE_` variables):
+Store the production credentials in Firebase Secret Manager:
 
 ```bash
 firebase functions:secrets:set MAPPLS_CLIENT_ID
 firebase functions:secrets:set MAPPLS_CLIENT_SECRET
 ```
 
-Then deploy the function:
+Deploy the callable function with:
 
 ```bash
 firebase deploy --only functions:mapplsProxy
 ```
 
-No `VITE_MAPPLS_PROXY_URL` is required. The frontend calls the Firebase callable function directly.
+The function runs in asia-south1, matching the project's Firestore region.
 
-The function is deployed to `asia-south1`, matching the project's Firestore region.
+For local frontend configuration, copy .env.local.example to .env.local and provide the Firebase web configuration values. Never commit .env.local.
+
+## Development
+
+```bash
+npm ci
+npm run lint
+npm run build
+npm run dev
+```
+
+For Cloud Functions:
+
+```bash
+cd functions
+npm ci
+npm run build
+```
+
+## CI
+
+The public repository runs GitHub Actions on pushes and pull requests targeting main.
+
+CI verifies:
+
+1. Frontend dependency installation
+2. Frontend lint
+3. Frontend production build
+4. Cloud Functions dependency installation
+5. Cloud Functions TypeScript build
