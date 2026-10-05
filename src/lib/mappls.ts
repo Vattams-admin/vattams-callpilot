@@ -4,6 +4,9 @@
 // do not block the CallPilot web client.
 
 
+import { httpsCallable } from 'firebase/functions'
+import { functions } from '../firebase'
+
 export type BusinessPlace = {
   name: string
   address: string
@@ -70,36 +73,28 @@ type MapplsAction =
   | 'textSearch'
   | 'placeDetails'
 
+const mapplsProxy = httpsCallable<
+  { action: MapplsAction; query?: string; eLoc?: string },
+  T | null
+>(functions, 'mapplsProxy')
+
 async function mapplsCall<T>(
   action: MapplsAction,
   payload: { query?: string; eLoc?: string } = {},
 ): Promise<T | null> {
-  const proxyUrl = import.meta.env.VITE_MAPPLS_PROXY_URL as string | undefined
-
-  if (!proxyUrl) {
-    throw new MapplsApiError('unavailable')
-  }
-
   try {
-    const response = await fetch(proxyUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ action, ...payload }),
-    })
-
-    if (!response.ok) {
-      if (response.status === 401) throw new MapplsApiError('unauthorized')
-      if (response.status === 403) throw new MapplsApiError('forbidden')
-      if (response.status === 429) throw new MapplsApiError('rate_limited')
-      if (response.status >= 500) throw new MapplsApiError('network')
-      throw new MapplsApiError('malformed')
-    }
-
-    return (await response.json()) as T
+    const result = await mapplsProxy({ action, ...payload })
+    return result.data
   } catch (error) {
-    if (error instanceof MapplsApiError) throw error
+    const code = typeof error === 'object' && error !== null && 'code' in error
+      ? String((error as { code?: unknown }).code)
+      : ''
+
+    if (code.includes('unauthenticated')) throw new MapplsApiError('unauthorized')
+    if (code.includes('permission-denied')) throw new MapplsApiError('forbidden')
+    if (code.includes('resource-exhausted')) throw new MapplsApiError('rate_limited')
+    if (code.includes('unavailable')) throw new MapplsApiError('unavailable')
+    if (code.includes('invalid-argument')) throw new MapplsApiError('malformed')
     throw new MapplsApiError('network')
   }
 }
