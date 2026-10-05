@@ -75,7 +75,7 @@ type MapplsAction =
 
 const mapplsProxy = httpsCallable<
   { action: MapplsAction; query?: string; eLoc?: string },
-  T | null
+  unknown
 >(functions, 'mapplsProxy')
 
 async function mapplsCall<T>(
@@ -84,7 +84,7 @@ async function mapplsCall<T>(
 ): Promise<T | null> {
   try {
     const result = await mapplsProxy({ action, ...payload })
-    return result.data
+    return result.data as T | null
   } catch (error) {
     const code = typeof error === 'object' && error !== null && 'code' in error
       ? String((error as { code?: unknown }).code)
