@@ -122,19 +122,36 @@ function App() {
   const [noPhoneBusiness, setNoPhoneBusiness] = useState<BusinessPlace | null>(null)
   const [discoveryLoading, setDiscoveryLoading] = useState(false)
   const [callStatus, setCallStatus] = useState<CallStatus>('idle')
-  const [completedCalls, setCompletedCalls] = useState(() => {
-    const saved = localStorage.getItem('cob_completed_calls')
-    return saved ? Number(saved) : 0
-  })
+  const [completedCalls, setCompletedCalls] = useState(0)
 
   const [callHistory, setCallHistory] = useState<Array<{
     recipient: string
     category: Category
     request: string
-  }>>(() => {
-    const saved = localStorage.getItem('cob_call_history')
-    return saved ? JSON.parse(saved) : []
-  })
+  }>>([])
+
+  useEffect(() => {
+    if (!user) {
+      setCompletedCalls(0)
+      setCallHistory([])
+      return
+    }
+
+    const callsKey = `cob_completed_calls_${user.uid}`
+    const historyKey = `cob_call_history_${user.uid}`
+
+    try {
+      const savedCount = Number(localStorage.getItem(callsKey) ?? '0')
+      setCompletedCalls(Number.isFinite(savedCount) && savedCount >= 0 ? savedCount : 0)
+
+      const savedHistory = localStorage.getItem(historyKey)
+      const parsedHistory = savedHistory ? JSON.parse(savedHistory) : []
+      setCallHistory(Array.isArray(parsedHistory) ? parsedHistory : [])
+    } catch {
+      setCompletedCalls(0)
+      setCallHistory([])
+    }
+  }, [user])
 
   useEffect(() => {
     if (callStatus === 'calling') {
@@ -152,10 +169,13 @@ function App() {
       return () => clearTimeout(timer)
     }
 
-    if (callStatus === 'completed') {
+    if (callStatus === 'completed' && user) {
+      const callsKey = `cob_completed_calls_${user.uid}`
+      const historyKey = `cob_call_history_${user.uid}`
+
       setCompletedCalls((count) => {
         const next = count + 1
-        localStorage.setItem('cob_completed_calls', String(next))
+        localStorage.setItem(callsKey, String(next))
         return next
       })
 
@@ -164,11 +184,11 @@ function App() {
           ...history,
           { recipient, category, request },
         ]
-        localStorage.setItem('cob_call_history', JSON.stringify(next))
+        localStorage.setItem(historyKey, JSON.stringify(next))
         return next
       })
     }
-  }, [callStatus])
+  }, [callStatus, user, recipient, category, request])
 
   const createPlan = async () => {
     if (!recipient.trim() || !request.trim()) return
@@ -757,7 +777,7 @@ function App() {
                   </div>
                   <div>
                     <span>STATUS</span>
-                    <strong>Demo result received</strong>
+                    <strong>Demo simulation completed</strong>
                   </div>
                 </div>
 
