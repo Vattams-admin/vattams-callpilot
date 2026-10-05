@@ -150,17 +150,29 @@ export const mapplsProxy = onCall(
       throw new HttpsError('unauthenticated', 'Sign in is required for business discovery.')
     }
 
-    const data = request.data as {
-      action?: string
-      query?: string
-      location?: string
-      eLoc?: string
+    const data = request.data
+
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new HttpsError('invalid-argument', 'Request payload must be an object.')
     }
 
-    const action = data?.action
+    const action = typeof data.action === 'string' ? data.action : ''
+    const query = typeof data.query === 'string' ? data.query.trim() : ''
+    const eLoc = typeof data.eLoc === 'string' ? data.eLoc.trim() : ''
+
+    if (!action || !['resolveLocation', 'textSearch', 'nearbySearch', 'placeDetails'].includes(action)) {
+      throw new HttpsError('invalid-argument', 'Unknown Mappls operation.')
+    }
+
+    if (query.length > 200) {
+      throw new HttpsError('invalid-argument', 'Search query is too long.')
+    }
+
+    if (eLoc.length > 100) {
+      throw new HttpsError('invalid-argument', 'Location identifier is invalid.')
+    }
 
     if (action === 'resolveLocation') {
-      const query = String(data.query ?? '').trim()
       if (!query) throw new HttpsError('invalid-argument', 'Location query is required.')
 
       const url = new URL(`${ATLAS_BASE}/textsearch/json`)
@@ -170,7 +182,6 @@ export const mapplsProxy = onCall(
     }
 
     if (action === 'textSearch') {
-      const query = String(data.query ?? '').trim()
       if (!query) throw new HttpsError('invalid-argument', 'Search query is required.')
 
       const url = new URL(`${ATLAS_BASE}/textsearch/json`)
@@ -180,8 +191,7 @@ export const mapplsProxy = onCall(
     }
 
     if (action === 'nearbySearch') {
-      const keywords = String(data.query ?? '').trim()
-      const eLoc = String(data.eLoc ?? '').trim()
+      const keywords = query
       if (!keywords || !eLoc) {
         throw new HttpsError('invalid-argument', 'Nearby search requires keywords and a location.')
       }
@@ -196,7 +206,6 @@ export const mapplsProxy = onCall(
     }
 
     if (action === 'placeDetails') {
-      const eLoc = String(data.eLoc ?? '').trim()
       if (!eLoc) throw new HttpsError('invalid-argument', 'Place eLoc is required.')
 
       const url = new URL(`${PLACE_DETAILS_BASE}/${encodeURIComponent(eLoc)}`)
