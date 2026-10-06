@@ -45,10 +45,10 @@ button:disabled {
 
 .app-shell {
   width: 100%;
-  max-width: 760px;
+  max-width: 1440px;
   min-height: 100vh;
   margin: 0 auto;
-  padding-bottom: 116px;
+  padding-bottom: 40px;
 }
 
 /* ─────────────────────────────────────────
@@ -59,13 +59,13 @@ button:disabled {
   position: sticky;
   top: 0;
   z-index: 50;
-  height: 76px;
-  padding: 0 18px;
+  min-height: 82px;
+  padding: 0 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,.07);
-  background: rgba(7,7,11,.78);
+  background: rgba(5,10,23,.86);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
 }
@@ -85,7 +85,7 @@ button:disabled {
   place-items: center;
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 14px;
-  background: linear-gradient(145deg, #705cff, #8d5cff);
+  background: linear-gradient(145deg, #0B5CFF, #06B6D4);
   box-shadow:
     0 10px 30px rgba(104,82,255,.28),
     inset 0 1px 0 rgba(255,255,255,.2);
@@ -112,7 +112,7 @@ button:disabled {
   letter-spacing: 1.8px;
 }
 
-.demo-badge {
+.brand-link { text-decoration: none; color: inherit; }\n\n.brand-vattams { color: #60A5FA; }\n\n.desktop-nav { display:flex; align-items:center; gap:6px; margin-left:auto; margin-right:20px; }\n.desktop-nav button { border:0; background:transparent; color:#AAB2C5; padding:10px 12px; border-radius:10px; font-size:13px; font-weight:700; }\n.desktop-nav button:hover, .desktop-nav button.nav-active { color:#fff; background:rgba(59,130,246,.12); }\n.topbar-actions { display:flex; align-items:center; gap:8px; }\n.platform-link { color:#94A3B8; text-decoration:none; font-size:11px; font-weight:700; }\n.platform-link:hover { color:#fff; }\n\n.demo-badge {
   flex: 0 0 auto;
   padding: 7px 11px;
   border: 1px solid rgba(255,255,255,.11);
@@ -601,7 +601,7 @@ select {
    BOTTOM NAV
 ───────────────────────────────────────── */
 
-.bottom-nav {
+.corporate-footer { margin-top:80px; border-top:1px solid rgba(255,255,255,.08); background:linear-gradient(180deg,#07101F,#030914); }\n.corporate-footer-inner { max-width:1440px; margin:0 auto; padding:42px 28px 28px; display:grid; grid-template-columns:1.5fr 1fr 1.2fr; gap:40px; }\n.footer-brand { color:#fff; font-size:20px; font-weight:850; letter-spacing:-.5px; }\n.footer-brand span { color:#22C55E; }\n.corporate-footer p { color:#7F8799; max-width:420px; line-height:1.7; margin:10px 0 0; font-size:13px; }\n.footer-links { display:flex; flex-direction:column; gap:10px; }\n.footer-links a { color:#AAB2C5; text-decoration:none; font-size:13px; font-weight:650; }\n.footer-links a:hover { color:#fff; }\n.footer-meta { display:flex; flex-direction:column; gap:8px; align-items:flex-end; text-align:right; color:#657084; font-size:11px; }\n\n.bottom-nav {
   position: fixed;
   z-index: 80;
   left: 50%;
@@ -1345,4 +1345,22 @@ select {
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
   }
+}
+
+
+@media (min-width: 1100px) {
+  .app-shell { padding-bottom: 0; }
+  .bottom-nav { display:none; }
+  main { padding: 0 36px; }
+}
+
+@media (max-width: 900px) {
+  .desktop-nav, .platform-link { display:none; }
+  .topbar { padding: 0 16px; }
+  .corporate-footer-inner { grid-template-columns:1fr 1fr; }
+  .footer-meta { align-items:flex-start; text-align:left; }
+}
+
+@media (max-width: 640px) {
+  .corporate-footer-inner { grid-template-columns:1fr; padding:32px 20px 24px; }
 }
