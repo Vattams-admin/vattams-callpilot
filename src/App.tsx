@@ -60,11 +60,38 @@ function App() {
   const [authError, setAuthError] = useState('')
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser)
+    let settled = false
+    const timeout = window.setTimeout(() => {
+      if (settled) return
+      console.error('CallPilot Firebase Auth initialization timed out')
       setAuthLoading(false)
-    })
-    return unsubscribe
+      setAuthError('Authentication is taking too long. Check your connection and retry.')
+      settled = true
+    }, 10000)
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (currentUser) => {
+        settled = true
+        window.clearTimeout(timeout)
+        setUser(currentUser)
+        setAuthLoading(false)
+      },
+      (error) => {
+        console.error('CallPilot Firebase Auth state error:', error)
+        settled = true
+        window.clearTimeout(timeout)
+        setUser(null)
+        setAuthLoading(false)
+        setAuthError('Authentication is temporarily unavailable. Check your connection and retry.')
+      },
+    )
+
+    return () => {
+      settled = true
+      window.clearTimeout(timeout)
+      unsubscribe()
+    }
   }, [])
 
   const [page, setPageState] = useState<Page>(() => {
