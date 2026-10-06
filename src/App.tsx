@@ -712,14 +712,24 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand">
+        <a className="brand brand-link" href="/" aria-label="VATTAMS CallPilot home">
           <div className="brand-mark">☎</div>
           <div>
-            <strong>VATTAMS CallPilot</strong>
-            <span>AI CALLING ASSISTANT</span>
+            <strong><span className="brand-vattams">VATTAMS</span> CallPilot</strong>
+            <span>SMART CALLING & COMMUNICATION</span>
           </div>
+        </a>
+        <nav className="desktop-nav" aria-label="CallPilot navigation">
+          <button className={page === 'home' ? 'nav-active' : ''} onClick={() => setPage('home')}>Home</button>
+          <button className={page === 'calls' ? 'nav-active' : ''} onClick={() => setPage('calls')}>Call History</button>
+          <button className={page === 'usage' ? 'nav-active' : ''} onClick={() => setPage('usage')}>Usage</button>
+          <button className={page === 'profile' ? 'nav-active' : ''} onClick={() => setPage('profile')}>Profile</button>
+        </nav>
+        <div className="topbar-actions">
+          <a className="platform-link" href="https://academia.vattams.net">Academia</a>
+          <a className="platform-link" href="https://vattams.net">Home Services</a>
+          <div className="demo-badge">CALLPILOT</div>
         </div>
-        <div className="demo-badge">DEMO</div>
       </header>
 
       <main>
@@ -803,38 +813,30 @@ function App() {
       )}
 
       <nav className="bottom-nav">
-        <button
-          className={page === 'home' ? 'nav-active' : ''}
-          onClick={() => setPage('home')}
-          type="button"
-        >
-          <span>⌂</span>Home
-        </button>
-
-        <button
-          className={page === 'calls' ? 'nav-active' : ''}
-          onClick={() => setPage('calls')}
-          type="button"
-        >
-          <span>◷</span>Calls
-        </button>
-
-        <button
-          className={page === 'usage' ? 'nav-active' : ''}
-          onClick={() => setPage('usage')}
-          type="button"
-        >
-          <span>◉</span>Usage
-        </button>
-
-        <button
-          className={page === 'profile' ? 'nav-active' : ''}
-          onClick={() => setPage('profile')}
-          type="button"
-        >
-          <span>○</span>Profile
-        </button>
+        <button className={page === 'home' ? 'nav-active' : ''} onClick={() => setPage('home')} type="button"><span>⌂</span>Home</button>
+        <button className={page === 'calls' ? 'nav-active' : ''} onClick={() => setPage('calls')} type="button"><span>◷</span>Calls</button>
+        <button className={page === 'usage' ? 'nav-active' : ''} onClick={() => setPage('usage')} type="button"><span>◉</span>Usage</button>
+        <button className={page === 'profile' ? 'nav-active' : ''} onClick={() => setPage('profile')} type="button"><span>○</span>Profile</button>
       </nav>
+
+      <footer className="corporate-footer">
+        <div className="corporate-footer-inner">
+          <div>
+            <div className="footer-brand">VATTAMS <span>CallPilot</span></div>
+            <p>Smart calling and communication for individuals, professionals, and businesses.</p>
+          </div>
+          <div className="footer-links">
+            <a href="https://academia.vattams.net">VATTAMS Academia</a>
+            <a href="https://vattams.net">VATTAMS Home Services</a>
+            <a href="/">CallPilot</a>
+          </div>
+          <div className="footer-meta">
+            <span>VATTAMS Global Technologies Private Limited</span>
+            <span>Technology Built Around You.</span>
+            <span>© 2026 VATTAMS. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
 
       {showPlan && (
         <div className="modal-backdrop" onClick={() => setShowPlan(false)}>
